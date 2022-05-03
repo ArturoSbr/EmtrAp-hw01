@@ -40,8 +40,11 @@ tau / sqrt(sum(t$s2 / t$y_bar))
 
 # Q2 --------------------------------------------------------------------------------------------------------------
 
+# Unir baseline a endline
+t <- merge(d2 %>% select(pid, productivity), d1 %>% select(pid, T_nap, female_, age_, sleep_report), by = 'pid')
+
 # KNN = 1
-match_1nn <- matchit(formula = T_nap ~ female_ + age_ + sleep_report, data = d1, method = 'nearest',
+match_1nn <- matchit(formula = T_nap ~ female_ + age_ + sleep_report, data = t, method = 'nearest',
                      ratio = 1, distance = 'mahalanobis', estimand = 'ATT')
 
 # Tau K = 1
@@ -51,7 +54,7 @@ match.data(match_1nn) %>%
   mutate(tau = y_bar - lag(y_bar))
 
 # KNN = 5
-match_5nn <- matchit(formula = T_nap ~ female_ + age_ + sleep_report, data = d1,
+match_5nn <- matchit(formula = T_nap ~ female_ + age_ + sleep_report, data = t,
                      method = 'nearest', ratio = 5, distance = 'mahalanobis', estimand = 'ATT')
 
 # Tau K = 5
@@ -61,7 +64,7 @@ match.data(match_5nn) %>%
   mutate(tau = y_bar - lag(y_bar))
 
 # KNN = 10
-match_10nn <- matchit(formula = T_nap ~ female_ + age_ + sleep_report, data = d1,
+match_10nn <- matchit(formula = T_nap ~ female_ + age_ + sleep_report, data = t,
                       method = 'nearest', ratio = 10, distance = 'mahalanobis', estimand = 'ATT')
 
 # Tau K = 10
