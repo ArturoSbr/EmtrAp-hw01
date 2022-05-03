@@ -86,7 +86,7 @@ m3 <- glm(formula = T_nap ~ age_ + female_ + education_ + sleep_night + no_of_ch
           family = binomial(link = logit), data = d1)
 
 # Resultados a tabla
-stargazer(m1, m2, m3)
+stargazer(m1, m2, m3, type = "text", covariate.labels = c('age','female','education','sleep night','children'))
 
 # b) Tabla de PSMs
 
@@ -96,4 +96,17 @@ t <- data.frame(lpm = m1$fitted.values, probit = m2$fitted.values, logit = m3$fi
 # Promedio y sdev
 t %>% 
   summarise_all(.funs = list(mean, sd))
+
+# Reponderador con Probit
+match_prb <- matchit(formula = T_nap ~ age_ + female_ + education_ + sleep_night + no_of_children_,
+                     data = d1, method = 'subclass', link = 'probit', estimand = 'ATE')
+
+# Diferencias con probit
+match.data(match_prb) %>% 
+  group_by(T_nap) %>% 
+  select(time_in_office, age_, female_, education_, sleep_night, no_of_children_, act_inbed,
+         an_12_number_of_awakenings, an_13_average_awakening_length, unemployed) %>% 
+  summarise_all(mean)
+
+# efectos en productivity, nap time mins, sleep report, happy, cog y typing time hr
 
