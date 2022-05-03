@@ -3,6 +3,7 @@
 # Librerías
 library(dplyr)
 library(MatchIt)
+library(stargazer)
 
 # Leer datos
 d1 <- read.csv('../dat/baseline.csv')
@@ -75,4 +76,24 @@ match.data(match_10nn) %>%
 
 # Q3 --------------------------------------------------------------------------------------------------------------
 
-# 
+# a) PSM por MPL, Probit y Logit
+
+# Ajustar  modelos
+m1 <- lm(formula = T_nap ~ age_ + female_ + education_ + sleep_night + no_of_children_, data = d1)
+m2 <- glm(formula = T_nap ~ age_ + female_ + education_ + sleep_night + no_of_children_,
+          family = binomial(link = probit), data = d1)
+m3 <- glm(formula = T_nap ~ age_ + female_ + education_ + sleep_night + no_of_children_,
+          family = binomial(link = logit), data = d1)
+
+# Resultados a tabla
+stargazer(m1, m2, m3)
+
+# b) Tabla de PSMs
+
+# Scores a tabla
+t <- data.frame(lpm = m1$fitted.values, probit = m2$fitted.values, logit = m3$fitted.values)
+
+# Promedio y sdev
+t %>% 
+  summarise_all(.funs = list(mean, sd))
+
